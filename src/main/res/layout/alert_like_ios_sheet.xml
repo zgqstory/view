@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.0"
+            android:orientation="vertical"
+            android:background="@drawable/alert_like_ios_bg_header">
+
+        <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/alert_like_ios_sheet_header_height"
+                android:gravity="center"
+                android:textColor="@color/alert_like_ios_sheet_txt_default"
+                android:textSize="@dimen/alert_like_ios_sheet_txt_header_size" />
+
+        <TextView
+                android:id="@+id/tv_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/alert_like_ios_sheet_margin_header_msg"
+                android:gravity="center"
+                android:textColor="@color/alert_like_ios_sheet_txt_default"
+                android:textSize="@dimen/alert_like_ios_sheet_txt_msg_size" />
+        <ListView
+                android:id="@+id/list_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:listSelector="@drawable/alert_like_ios_bg_button_none"
+                android:cacheColorHint="@android:color/transparent"
+                android:divider="@null"
+                android:scrollbars="none"/>
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/alert_like_ios_cancel_height"
+            android:layout_marginTop="@dimen/alert_like_ios_margin_msg_cancel"
+            android:gravity="center"
+            android:clickable="true"
+            android:background="@drawable/alert_like_ios_bg_cancel"
+            android:textColor="@color/alert_like_ios_txt_cancel"
+            android:textStyle="bold"
+            android:textSize="@dimen/alert_like_ios_txt_cancel_size"
+            android:visibility="gone" />
+
+</LinearLayout>

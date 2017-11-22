@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- 自定义弹出对话框 alert_like_ios -->
+    <dimen name="alert_like_ios_alert_left_right">40dp</dimen>
+    <dimen name="alert_like_ios_sheet_left_right">10dp</dimen>
+    <dimen name="alert_like_ios_divider">1dp</dimen>
+    <dimen name="alert_like_ios_radius">15px</dimen>
+    <dimen name="alert_like_ios_sheet_header_height">40dp</dimen>
+    <dimen name="alert_like_ios_alert_header_height">60dp</dimen>
+    <dimen name="alert_like_ios_cancel_height">48dp</dimen>
+    <dimen name="alert_like_ios_button_height">48dp</dimen>
+    <dimen name="alert_like_ios_sheet_txt_header_size">14sp</dimen>
+    <dimen name="alert_like_ios_sheet_txt_msg_size">14sp</dimen>
+    <dimen name="alert_like_ios_alert_txt_header_size">22sp</dimen>
+    <dimen name="alert_like_ios_alert_txt_header_size_when_msg_null">18sp</dimen>
+    <dimen name="alert_like_ios_alert_txt_msg_size">18sp</dimen>
+    <dimen name="alert_like_ios_txt_cancel_size">18sp</dimen>
+    <dimen name="alert_like_ios_txt_button_size">18sp</dimen>
+    <dimen name="alert_like_ios_sheet_margin_header_msg">14dp</dimen>
+    <dimen name="alert_like_ios_alert_margin_header_msg">25dp</dimen>
+    <dimen name="alert_like_ios_margin_msg_cancel">10dp</dimen>
+
+</resources>
