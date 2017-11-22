@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">view</string>
+
+    <!-- progress/ProgressDialog -->
+    <string name="progress_progress_dialog_loading">正在加载</string>
+    <string name="progress_progress_dialog_time">(%1$d)</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- progress/ProgressDialog -->
+    <color name="progress_progress_dialog_bg_window">#00000000</color>
+    <color name="progress_progress_dialog_bg_dialog">#85000000</color>
+
+</resources>
