@@ -1,17 +1,24 @@
 package com.story.view.custom_scroll_view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.MotionEvent;
+import android.view.View;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Scroller;
 
+import com.story.view.R;
+import com.story.view.utils.DensityUtil;
+
+import java.lang.reflect.Field;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,13 +31,15 @@ import java.util.TimerTask;
 
 public class CustomScrollView extends RelativeLayout {
 
-    private boolean isAutoScroll;//是否自动滑动
-    private boolean isShowDot;//是否显示dot
+    private static final int DEFAULT_DOT_SIZE = 10;//单位dp
+    private static final int AUTO_INTERVAL = 5;//自动滑动时间间隔
+
+    private boolean isShowDot;// 是否显示Dot
     private boolean hasSetDotParams;//使用者是否设置过Params
     private int dotImageSelected;//Dot选中图片
     private int dotImageNormal;//Dot默认图片
-    private int currentItem;//当前显示item下标
-    private int autoInterval = 3;//自动滑动时间间隔
+    private int dotImageSize;//Dot图片默认大小
+
     private Timer mTimer;
 
     private ViewPager viewPager;//承载页面主要内容
@@ -43,13 +52,47 @@ public class CustomScrollView extends RelativeLayout {
 
     public CustomScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CustomScrollView);
+        if (typedArray != null) {
+            isShowDot = typedArray.getBoolean(R.styleable.CustomScrollView_isShowDot, false);
+            dotImageNormal = typedArray.getResourceId(R.styleable.CustomScrollView_dotImageNormal, R.drawable.custom_scroll_view_dot_unselect_icon);
+            dotImageSelected = typedArray.getResourceId(R.styleable.CustomScrollView_dotImageSelected, R.drawable.custom_scroll_view_dot_select_icon);
+            dotImageSize = typedArray.getDimensionPixelSize(R.styleable.CustomScrollView_dotImageSize, DensityUtil.changeDpToPx(context, DEFAULT_DOT_SIZE));
+            typedArray.recycle();
+        }
+
         init(context);
     }
 
     private void init(Context context) {
         this.context = context;
         initViewPager();
+        setFixedScroller();
         initDotLayout();
+    }
+
+    /**
+     * 设置ViewPager滑动速度
+     */
+    private void setFixedScroller() {
+        try {
+            Field scrollerField = ViewPager.class.getDeclaredField("mScroller");
+            scrollerField.setAccessible(true);
+            Field interpolator = ViewPager.class.getDeclaredField("sInterpolator");
+            interpolator.setAccessible(true);
+            Scroller scroller = new Scroller(context, (Interpolator) interpolator.get(null)) {
+                @Override
+                public void startScroll(int startX, int startY, int dx, int dy, int duration) {
+                    super.startScroll(startX, startY, dx, dy, duration * 7);    // 这里是关键，将duration变长或变短
+                }
+            };
+            scrollerField.set(viewPager, scroller);
+        } catch (NoSuchFieldException e) {
+            // Do nothing.
+        } catch (IllegalAccessException e) {
+            // Do nothing.
+        }
     }
 
     /**
@@ -58,6 +101,10 @@ public class CustomScrollView extends RelativeLayout {
     private void initViewPager() {
         viewPager = new ViewPager(context);
         addView(viewPager);
+    }
+
+    public ViewPager getViewPager() {
+        return viewPager;
     }
 
     /**
@@ -72,21 +119,24 @@ public class CustomScrollView extends RelativeLayout {
         dotParams.setMargins(12,20,12,20);
         dotLayout.setLayoutParams(dotParams);
         addView(dotLayout);
+        if (!isShowDot) {
+            dotLayout.setVisibility(View.GONE);
+        }
     }
 
     /**
      * 开始自动滑动
      */
-    public void start() {
-        stop();
+    public void beginAutoScroll() {
+        stopAutoScroll();
         mTimer = new Timer();
-        mTimer.schedule(new AutoTask(), autoInterval, autoInterval);
+        mTimer.schedule(new AutoTask(), AUTO_INTERVAL*1000, AUTO_INTERVAL*1000);
     }
 
     /**
-     * 停止自动滑动
+     * 停止定时
      */
-    private void stop() {
+    private void stopAutoScroll() {
         if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
@@ -94,7 +144,7 @@ public class CustomScrollView extends RelativeLayout {
     }
 
     /**
-     * 通过Params设置Dot的位置（只修改位置、边距、大小，且方法值执行一次）
+     * 通过Params设置Dot的位置（只修改位置、边距，且方法值执行一次）
      * @param layoutParams layoutParams
      */
     public void setDotParams(LayoutParams layoutParams) {
@@ -115,13 +165,21 @@ public class CustomScrollView extends RelativeLayout {
 
     /**
      * 设置Dot的Item
+     * @param count item数量
+     */
+    public void setDotItemView(int count) {
+        setDotItemView(dotImageNormal, dotImageSelected, count, dotImageSize);
+    }
+
+    /**
+     * 设置Dot的Item
      * @param itemSelected item选择时图片
      * @param itemNormal item默认状态
      * @param count item数量
      * @param size item长宽(单位是px)
      */
-    public void setDotItemView(@DrawableRes int itemSelected, @DrawableRes int itemNormal, int count, int size) {
-        if (count > 0 && size > 0) {
+    public void setDotItemView(@DrawableRes int itemNormal, @DrawableRes int itemSelected, int count, int size) {
+        if (count > 0) {
             dotImageSelected = itemSelected;
             dotImageNormal = itemNormal;
             dotLayout.removeAllViews();
@@ -145,7 +203,7 @@ public class CustomScrollView extends RelativeLayout {
      * 更新Dot Item的状态
      * @param position 当前选择item下标
      */
-    private void updateDotLayout(int position) {
+    public void updateDotLayout(int position) {
         int size = dotLayout.getChildCount();
         if (position < size) {
             for (int i=0;i<size;i++) {
@@ -162,22 +220,8 @@ public class CustomScrollView extends RelativeLayout {
     @Override
     protected void onDetachedFromWindow() {
         // 控件被移出时取消定时
-        stop();
+        stopAutoScroll();
         super.onDetachedFromWindow();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // 控件被点击时停止任务
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                stop();
-                break;
-            case MotionEvent.ACTION_UP:
-                start();
-                break;
-        }
-        return super.onTouchEvent(event);
     }
 
     /************************************** 定时代码 *****************************************/
@@ -186,7 +230,7 @@ public class CustomScrollView extends RelativeLayout {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            currentItem = viewPager.getCurrentItem();
+            int currentItem = viewPager.getCurrentItem();
             if (viewPager.getAdapter() != null) {
                 if (currentItem == viewPager.getAdapter().getCount() - 1) {
                     currentItem = 0;
@@ -195,7 +239,7 @@ public class CustomScrollView extends RelativeLayout {
                 }
             }
             viewPager.setCurrentItem(currentItem);
-            updateDotLayout(currentItem);
+            updateDotLayout(currentItem % ((CustomScrollAdapter)viewPager.getAdapter()).getRealCount());
         }
     };
 

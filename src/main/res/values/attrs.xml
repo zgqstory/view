@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomScrollView">
+        <attr name="isShowDot" format="boolean" />
+        <attr name="dotImageSelected" format="reference|color" />
+        <attr name="dotImageNormal" format="reference|color" />
+        <attr name="dotImageSize" format="dimension" />
+    </declare-styleable>
+    
+</resources>
